@@ -118,6 +118,23 @@ class QueryRecentResource(BaseResource):
 
 
 class BaseQueryListResource(BaseResource):
+    # TODO
+    @staticmethod
+    def add_cors_headers(response):
+        print("in")
+        if "Origin" in request.headers:
+            print("ino")
+            origin = request.headers["Origin"]
+
+            if set(["*", origin]) & settings.ACCESS_CONTROL_ALLOW_ORIGIN:
+                print("inin")
+                headers = {}
+                headers["Access-Control-Allow-Origin"] = origin
+                headers["Access-Control-Allow-Credentials"] = str(
+                    settings.ACCESS_CONTROL_ALLOW_CREDENTIALS
+                ).lower()
+                response["headers"] = headers
+
     def get_queries(self, search_term):
         if search_term:
             results = models.Query.search(
@@ -168,6 +185,13 @@ class BaseQueryListResource(BaseResource):
             with_stats=True,
             with_last_modified_by=False,
         )
+
+        # TODO
+        print(settings.ACCESS_CONTROL_ALLOW_ORIGIN)
+        if len(settings.ACCESS_CONTROL_ALLOW_ORIGIN) > 0:
+            print(settings.ACCESS_CONTROL_ALLOW_ORIGIN)
+            print(response)
+            self.add_cors_headers(response)
 
         if search_term:
             self.record_event(
